@@ -1,10 +1,15 @@
 /* eslint no-undef: 0 */
+
+// Important Variables
 var canvas
 var context
-var uploadedImage
 var pixelColor = [ 0, 0, 0, 255 ]
 
+// Control Variables
 var mouseDown = false
+
+// Editor Variables
+var eraserSelected = false
 
 function init () {
   listeners()
@@ -14,11 +19,17 @@ function init () {
 }
 
 function listeners () {
+  // Canvas Management
   $('#loadTemplate').on('click', () => { loadTemplate(false) })
   $('#uploadImg').on('change', upload)
-  $('#chooseColor').on('change', updateColor)
   $('#downloadImg').on('click', download)
 
+  // Edit Buttons
+  $('#selectEraser').on('click', function () { eraserSelected = true })
+  $('#selectPencil').on('click', function () { eraserSelected = false })
+  $('#selectColor').on('change', updateColor)
+
+  // Mouse Controls
   $('#pixeleditor').on('mousedown', function () {
     mouseDown = true
   })
@@ -27,9 +38,9 @@ function listeners () {
     mouseDown = false
   })
 
-  $('#pixeleditor').on('mousemove', function (e) {
+  $('#pixeleditor').on('mousemove', function (event) {
     if (mouseDown) {
-      editPixel(e)
+      editPixel(event)
     }
   })
 }
@@ -37,7 +48,7 @@ function listeners () {
 function upload (e) {
   var reader = new FileReader()
   reader.onload = function (event) {
-    uploadedImage = new Image()
+    let uploadedImage = new Image()
     uploadedImage.onload = function () {
       canvas.width = uploadedImage.width
       canvas.height = uploadedImage.height
@@ -49,27 +60,28 @@ function upload (e) {
   reader.readAsDataURL(e.target.files[0])
 }
 
-function editPixel (e) {
-  let canvasOffset = $('#pixeleditor').offset()
+function editPixel (event) {
+  let element = $(event.target)
+  let canvasOffset = element.offset()
   let offsetX = canvasOffset.left - window.pageXOffset
   let offsetY = canvasOffset.top - window.pageYOffset
-  let pixelOffsetX = $('#pixeleditor').width() / canvas.width
-  let pixelOffsetY = $('#pixeleditor').height() / canvas.height
-  let mouseX = parseInt((e.clientX - offsetX) / pixelOffsetX)
-  let mouseY = parseInt((e.clientY - offsetY) / pixelOffsetY)
+  let pixelOffsetX = element.width() / canvas.width
+  let pixelOffsetY = element.height() / canvas.height
+  let mouseX = parseInt((event.clientX - offsetX) / pixelOffsetX)
+  let mouseY = parseInt((event.clientY - offsetY) / pixelOffsetY)
 
   let pxData = context.getImageData(mouseX, mouseY, 1, 1)
   for (let i = 0; i < 3; i++) {
     pxData.data[i] = pixelColor[i]
   }
-  pxData.data[3] = 255
+
+  pxData.data[3] = eraserSelected ? 0 : 255
 
   context.putImageData(pxData, mouseX, mouseY)
 }
 
-function updateColor () {
-  let hexColor = $('#chooseColor').val()
-  hexColor = hexColor.replace('#', '')
+function updateColor (event) {
+  let hexColor = event.target.value
   pixelColor = []
   pixelColor[0] = parseInt(hexColor.substring(0, 2), 16)
   pixelColor[1] = parseInt(hexColor.substring(2, 4), 16)
@@ -86,7 +98,6 @@ function download () {
 
 function loadTemplate (autoLoad) {
   if (!autoLoad) {
-    console.log('test')
     let confirmed = confirm('Are you sure you want to load the template? It will delete your current cape')
     if (!confirmed) {
       return
