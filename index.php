@@ -45,9 +45,10 @@
               <button type="button" class="btn btn-danger mb-1" id="selectEraser" title="Eraser"><i class="fas fa-eraser"></i></button>
               <button class="btn btn-dark jscolor {valueElement: 'selectColor'}" title="Choose colour"><i class="fas fa-palette"></i></button>
               <input type="hidden" id="selectColor" value="000000">
+              <button type="button" class="btn mt-1" id="pickColor" title="Colour picker"><i class="fas fa-eye-dropper"></i></button>
               <label type="button" id="uploadImg" class="btn btn-info btn-file mt-5" title="Upload cape"><i class="fas fa-upload"></i><input type="file" class="d-none"></label>
               <button type="button" id="downloadImg" class="btn btn-success mt-1" title="Download cape"><i class="fas fa-download"></i></button>
-              <button id="loadTemplate" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>              
+              <button id="loadTemplate" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
             </div>
           </div>
         </div>

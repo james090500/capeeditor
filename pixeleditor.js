@@ -10,6 +10,7 @@ var mouseDown = false
 
 // Editor Variables
 var eraserSelected = false
+var colorPickerSelected = false
 
 function init () {
   listeners()
@@ -30,8 +31,10 @@ function listeners () {
   $('#selectColor').on('change', updateColor)
 
   // Mouse Controls
-  $('#pixeleditor').on('mousedown', function () {
+  $('#pixeleditor').on('mousedown', function (event) {
     mouseDown = true
+    // This is needed to capture to first click
+    editPixel(event)
   })
 
   $('#pixeleditor').on('mouseup', function () {
@@ -42,6 +45,11 @@ function listeners () {
     if (mouseDown) {
       editPixel(event)
     }
+  })
+
+  $('#pickColor').on('click', function () {
+    $('#pixeleditor').css('cursor', 'help')
+    colorPickerSelected = true
   })
 }
 
@@ -71,6 +79,14 @@ function editPixel (event) {
   let mouseY = parseInt((event.clientY - offsetY) / pixelOffsetY)
 
   let pxData = context.getImageData(mouseX, mouseY, 1, 1)
+
+  if (colorPickerSelected) {
+    pixelColor = pxData.data
+    colorPickerSelected = false
+    $('#pixeleditor').css('cursor', 'crosshair')
+    return
+  }
+
   for (let i = 0; i < 3; i++) {
     pxData.data[i] = pixelColor[i]
   }
