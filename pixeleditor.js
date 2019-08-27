@@ -31,19 +31,23 @@ function listeners () {
   $('#selectColor').on('change', updateColor)
 
   // Mouse Controls
-  $('#pixeleditor').on('mousedown', function (event) {
+  $('#pixeleditor').on('mousedown', function () {
     mouseDown = true
     // This is needed to capture to first click
-    editPixel(event)
+    editPixel()
   })
 
   $('#pixeleditor').on('mouseup', function () {
     mouseDown = false
   })
 
-  $('#pixeleditor').on('mousemove', function (event) {
+  $('#pixeleditor').on('mousemove', function () {
     if (mouseDown) {
-      editPixel(event)
+      editPixel()
+    }
+
+    if (colorPickerSelected) {
+      updateColorPicker()
     }
   })
 
@@ -68,7 +72,7 @@ function upload (e) {
   reader.readAsDataURL(e.target.files[0])
 }
 
-function editPixel (event) {
+function getMouseLocation () {
   let element = $(event.target)
   let canvasOffset = element.offset()
   let offsetX = canvasOffset.left - window.pageXOffset
@@ -78,7 +82,12 @@ function editPixel (event) {
   let mouseX = parseInt((event.clientX - offsetX) / pixelOffsetX)
   let mouseY = parseInt((event.clientY - offsetY) / pixelOffsetY)
 
-  let pxData = context.getImageData(mouseX, mouseY, 1, 1)
+  return [ mouseX, mouseY ]
+}
+
+function editPixel () {
+  let mouse = getMouseLocation()
+  let pxData = context.getImageData(mouse[0], mouse[1], 1, 1)
 
   if (colorPickerSelected) {
     pixelColor = pxData.data
@@ -93,7 +102,16 @@ function editPixel (event) {
 
   pxData.data[3] = eraserSelected ? 0 : 255
 
-  context.putImageData(pxData, mouseX, mouseY)
+  context.putImageData(pxData, mouse[0], mouse[1])
+}
+
+function updateColorPicker () {
+  let mouse = getMouseLocation()
+  let pxData = context.getImageData(mouse[0], mouse[1], 1, 1)
+  let r = pxData.data[0]
+  let b = pxData.data[1]
+  let g = pxData.data[2]
+  $('#selectColorParent').css('background-color', 'rgb(' + r + ', ' + b + ', ' + g + ')')
 }
 
 function updateColor (event) {
