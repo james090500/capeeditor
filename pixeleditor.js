@@ -26,8 +26,8 @@ function listeners () {
   $('#downloadImg').on('click', download)
 
   // Edit Buttons
-  $('#selectEraser').on('click', function () { eraserSelected = true })
   $('#selectPencil').on('click', function () { eraserSelected = false })
+  $('#selectEraser').on('click', function () { eraserSelected = true })
   $('#selectColor').on('change', updateColor)
 
   // Mouse Controls
